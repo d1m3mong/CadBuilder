@@ -15,9 +15,12 @@ namespace CadBuilder {
         Renderer(const Camera3D& cam);
 
         void draw(const Object& object);
+        const Camera3D getCamera() const;
 
         private:
 
         Camera3D camera{};
     };
+
+    Vector3 transformPoint(Vector3 point, Vector3 position, Vector3 rotation);
 }

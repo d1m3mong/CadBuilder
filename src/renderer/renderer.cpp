@@ -1,6 +1,7 @@
 #include "renderer.hpp"
 #include "../math/rotation.hpp"
 #include "../scene/object.hpp"
+#include "../scene/geometry.hpp"
 
 #include <array>
 
@@ -26,6 +27,8 @@ namespace CadBuilder
 
     Vector3 transformPoint(Vector3 point, Vector3 position, Vector3 rotation) {
         Vector3 rotated = CadBuilder::rotateY(point, rotation.y);
+        rotated = CadBuilder::rotateX(rotated, rotation.x);
+        rotated = CadBuilder::rotateZ(rotated, rotation.z);
 
         Vector3 worldPos = {
             rotated.x + position.x,
@@ -41,20 +44,7 @@ namespace CadBuilder
         Vector3 size = object.transform.size;
         Vector3 rotation = object.transform.rotation;
 
-        float x = size.x / 2.0f;
-        float y = size.y / 2.0f;
-        float z = size.z / 2.0f;
-
-        std::array<Vector3, 8> points = {
-            Vector3{ -x, -y, -z },
-            Vector3{  x, -y, -z },
-            Vector3{ -x,  y, -z },
-            Vector3{  x,  y, -z },
-            Vector3{ -x, -y,  z },
-            Vector3{  x, -y,  z },
-            Vector3{ -x,  y,  z },
-            Vector3{  x,  y,  z }
-        };
+        std::array<Vector3, 8> points = CadBuilder::getObjectCorners(object);
 
         for (auto& point : points) {
             point = transformPoint(point, position, rotation);
@@ -87,6 +77,10 @@ namespace CadBuilder
             DrawLine3D(points[a], points[b], RED);
         }
 
+    }
+
+    const Camera3D Renderer::getCamera() const {
+        return camera;
     }
 
     Renderer::Renderer(const Camera3D& cam)
